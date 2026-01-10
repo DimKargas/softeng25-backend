@@ -1,0 +1,245 @@
+openapi: 3.0.0
+info:
+  title: EV Chargers API
+  version: 1.0.0
+  description: REST API for EV charging points management
+servers:
+  - url: https://localhost:9876/api
+paths:
+  /points:
+    get:
+      summary: Get all charge points
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+          description: Filter by status
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum: [json, csv]
+          description: Response format
+      responses:
+        '200':
+          description: Success
+        '204':
+          description: No content
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid status
+        '500':
+          description: Internal server error
+  /point/{id}:
+    get:
+      summary: Get charge point by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+  /reserve/{id}/{minutes}:
+    post:
+      summary: Reserve a charge point
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: minutes
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+  /updpoint/{id}:
+    post:
+      summary: Update charge point
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                kwhprice:
+                  type: number
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+  /newsession:
+    post:
+      summary: Create a new charging session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pointid:
+                  type: integer
+                starttime:
+                  type: string
+                endtime:
+                  type: string
+                startsoc:
+                  type: integer
+                endsoc:
+                  type: integer
+                totalkwh:
+                  type: number
+                kwhprice:
+                  type: number
+                amount:
+                  type: number
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+  /sessions/{id}/{from}/{to}:
+    get:
+      summary: Get charging sessions for a point
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: from
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: to
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum: [json, csv]
+      responses:
+        '200':
+          description: Success
+        '204':
+          description: No content
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+  /pointstatus/{pointid}/{from}/{to}:
+    get:
+      summary: Get point status changes
+      parameters:
+        - in: path
+          name: pointid
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: from
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: to
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum: [json, csv]
+      responses:
+        '200':
+          description: Success
+        '204':
+          description: No content
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+  /admin/healthcheck:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Database connection failed
+  /admin/resetpoints:
+    post:
+      summary: Reset charge points
+      responses:
+        '200':
+          description: Success
+        '500':
+          description: Reset points failed
+  /admin/addpoints:
+    post:
+      summary: Add charge points from CSV
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: No file uploaded
+        '500':
+          description: Add points failed

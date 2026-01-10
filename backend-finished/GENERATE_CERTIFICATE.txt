@@ -1,0 +1,6 @@
+# Self-signed certificate for local HTTPS development
+# Run these commands in PowerShell or Git Bash:
+#
+# openssl req -nodes -new -x509 -keyout key.pem -out cert.pem -days 365 -subj "/CN=localhost"
+#
+# Place key.pem and cert.pem in the backend - νεκταριοσ/ directory.
