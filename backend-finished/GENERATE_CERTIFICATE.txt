@@ -3,4 +3,4 @@
 #
 # openssl req -nodes -new -x509 -keyout key.pem -out cert.pem -days 365 -subj "/CN=localhost"
 #
-# Place key.pem and cert.pem in the backend - νεκταριοσ/ directory.
+# Place key.pem and cert.pem in the backend-finished/ directory.

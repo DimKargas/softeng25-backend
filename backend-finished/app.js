@@ -1,11 +1,16 @@
 
+
 const express = require("express");
 const fs = require("fs");
 const https = require("https");
+const path = require("path");
 const app = express();
 
 
+
+// Parse JSON bodies
 app.use(express.json());
+
 
 // Custom error handler for invalid JSON
 app.use((err, req, res, next) => {
@@ -22,6 +27,8 @@ app.use((err, req, res, next) => {
 });
 
 
+
+// All API routes under /api
 app.use("/api/points", require("./routes/points"));
 app.use("/api/point", require("./routes/point"));
 app.use("/api/reserve", require("./routes/reserve"));
@@ -33,6 +40,7 @@ app.use("/api/admin", require("./routes/admin"));
 
 
 
+
 // Custom 404 handler for all unmatched routes
 const errorResponse = require("./utils/errorResponse");
 app.use((req, res) => {
@@ -40,9 +48,10 @@ app.use((req, res) => {
 });
 
 
+
 const PORT = 9876;
-const keyPath = __dirname + '/key.pem';
-const certPath = __dirname + '/cert.pem';
+const keyPath = path.join(__dirname, 'key.pem');
+const certPath = path.join(__dirname, 'cert.pem');
 
 if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
   const options = {
@@ -50,11 +59,12 @@ if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
     cert: fs.readFileSync(certPath)
   };
   https.createServer(options, app).listen(PORT, () => {
-    console.log(`HTTPS server running on https://localhost:${PORT}`);
+    console.log(`\x1b[32mHTTPS server running on https://localhost:${PORT}/api\x1b[0m`);
+    console.log('Για να συνδεθείτε αγνοήστε το browser warning (λόγω self-signed πιστοποιητικού).');
   });
 } else {
   app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT} (no SSL certs found)`);
-    console.log('To enable HTTPS, generate key.pem and cert.pem as described in GENERATE_CERTIFICATE.txt');
+    console.log(`\x1b[33mServer running on http://localhost:${PORT} (no SSL certs found)\x1b[0m`);
+    console.log('Για HTTPS, δημιουργήστε key.pem και cert.pem όπως περιγράφεται στο GENERATE_CERTIFICATE.txt');
   });
 }
